@@ -201,12 +201,67 @@ void main() {
     });
 
     test('pool grows correctly across calls of varying length', () {
-      // Вызовы разных размеров по очереди — буфера должен аккуратно расти.
       expect(damerauLevenshteinV7('ab', 'ba'), 2);
       expect(damerauLevenshteinV7('a' * 100, 'b' * 100), 100);
       expect(damerauLevenshteinV7('a' * 200, 'a' * 200), 0);
       expect(damerauLevenshteinV7('hi', 'no'), 2);
       expect(damerauLevenshteinV7('a' * 500, 'a' * 500), 0);
+    });
+  });
+
+  group('v8 (v7 + bag-of-chars filter)', () {
+    test('matches v7 on 1000 random pairs without threshold', () {
+      final rng = Random(30);
+      for (var i = 0; i < 1000; i++) {
+        final a = randomString(rng, 0, 24);
+        final b = randomString(rng, 0, 24);
+        expect(damerauLevenshteinV8(a, b), damerauLevenshteinV7(a, b),
+            reason: '($a) vs ($b)');
+      }
+    });
+
+    test('matches v7 on 1000 random pairs WITH threshold (filter must be sound)', () {
+      final rng = Random(31);
+      for (final th in [0, 1, 2, 3, 5, 10]) {
+        for (var i = 0; i < 250; i++) {
+          final a = randomString(rng, 0, 30);
+          final b = randomString(rng, 0, 30);
+          final got = damerauLevenshteinV8(a, b, threshold: th);
+          final want = damerauLevenshteinV7(a, b, threshold: th);
+          expect(got, want, reason: 'threshold=$th, ($a) vs ($b)');
+        }
+      }
+    });
+
+    test('handles edge cases', () {
+      expect(damerauLevenshteinV8('', ''), 0);
+      expect(damerauLevenshteinV8('abc', 'abc'), 0);
+      expect(damerauLevenshteinV8('', 'hello'), 5);
+      expect(damerauLevenshteinV8('hello', ''), 5);
+      expect(damerauLevenshteinV8('a', 'b', threshold: 0), 1);
+      expect(damerauLevenshteinV8('kitten', 'sitting'), 3);
+      // Same chars different order — bag-filter не должен отвергать!
+      expect(damerauLevenshteinV8('abc', 'cba', threshold: 2),
+          damerauLevenshteinV7('abc', 'cba', threshold: 2));
+    });
+
+    test('bag filter is sound under cyrillic input', () {
+      // Реальные русские слова с разной степенью пересечения.
+      const pairs = [
+        ('кот', 'код'),
+        ('собака', 'кошка'),
+        ('программа', 'программист'),
+        ('абвгд', 'едгва'), // полная переподстановка
+      ];
+      for (final (a, b) in pairs) {
+        for (final th in [0, 1, 2, 3, 5]) {
+          expect(
+            damerauLevenshteinV8(a, b, threshold: th),
+            damerauLevenshteinV7(a, b, threshold: th),
+            reason: 'th=$th, ($a) vs ($b)',
+          );
+        }
+      }
     });
   });
 

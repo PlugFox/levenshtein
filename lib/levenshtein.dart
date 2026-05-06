@@ -12,3 +12,4 @@ export 'src/v4_ukkonen.dart' show damerauLevenshteinV4;
 export 'src/v5_myers.dart' show levenshteinClassic, levenshteinMyers;
 export 'src/v6_simd.dart' show levenshteinSimd;
 export 'src/v7_optimal.dart' show damerauLevenshteinV7;
+export 'src/v8_bag_filter.dart' show damerauLevenshteinV8;

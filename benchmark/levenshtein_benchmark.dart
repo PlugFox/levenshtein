@@ -159,6 +159,14 @@ class V7ThresholdBench extends _PairBenchmark {
       runOnce((a, b) => damerauLevenshteinV7(a, b, threshold: 3));
 }
 
+class V8ThresholdBench extends _PairBenchmark {
+  V8ThresholdBench(String corpus, List<(String, String)> pairs)
+      : super('v8_thr=3    / $corpus', pairs);
+  @override
+  void run() =>
+      runOnce((a, b) => damerauLevenshteinV8(a, b, threshold: 3));
+}
+
 void main() {
   final corpora = [
     Corpus('short  (5..15)  ', 5, 15),
@@ -188,6 +196,7 @@ void main() {
     V4Bench(c.name, c.pairs).report();
     V7Bench(c.name, c.pairs).report();
     V7ThresholdBench(c.name, c.pairs).report();
+    V8ThresholdBench(c.name, c.pairs).report();
     V5Bench(c.name, c.pairs).report();
     V6Bench(c.name, c.pairs).report();
   }

@@ -194,6 +194,13 @@ class V7ThresholdSearch extends _SearchBench {
       (a, b) => damerauLevenshteinV7(a, b, threshold: _threshold);
 }
 
+class V8ThresholdSearch extends _SearchBench {
+  V8ThresholdSearch(super.name, super.ds);
+  @override
+  int Function(String a, String b) get distance =>
+      (a, b) => damerauLevenshteinV8(a, b, threshold: _threshold);
+}
+
 void main() {
   // ignore: avoid_print
   print('Загружаю датасет $_dataPath ...');
@@ -214,6 +221,7 @@ void main() {
     damerauLevenshteinV7,
     (a, b) => damerauLevenshteinV4(a, b, threshold: _threshold),
     (a, b) => damerauLevenshteinV7(a, b, threshold: _threshold),
+    (a, b) => damerauLevenshteinV8(a, b, threshold: _threshold),
     levenshteinMyers,
   ]) {
     _topKSearch(ds.haystack.sublist(0, 100), ds.queries.sublist(0, 5), f);
@@ -225,5 +233,6 @@ void main() {
   V7Search('v7_optimal       ', ds).report();
   V4ThresholdSearch('v4_threshold=$_threshold    ', ds).report();
   V7ThresholdSearch('v7_threshold=$_threshold    ', ds).report();
+  V8ThresholdSearch('v8_threshold=$_threshold    ', ds).report();
   V5MyersSearch('v5_myers         ', ds).report();
 }

@@ -1,0 +1,15 @@
+# Dart/Pub
+.dart_tool/
+.packages
+build/
+pubspec_overrides.yaml
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
